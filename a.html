@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор YAML для каталога товаров</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Добавить категорию</h2>
+    <input type="text" id="categoryName" placeholder="Название категории">
+    <button onclick="addCategory()">Добавить категорию</button>
+
+    <h2>Добавить товар</h2>
+    <select id="categoriesDropdown"></select>
+    <input type="text" id="productName" placeholder="Название товара">
+    <input type="number" id="productPrice" placeholder="Цена">
+    <button onclick="addProduct()">Добавить товар</button>
+
+    <h2>Сгенерированный YAML</h2>
+    <textarea id="generatedYAML" rows="10" cols="50" readonly></textarea>
+    <br>
+    <button onclick="generateYAML()">Сгенерировать YAML</button>
+</div>
+
+<script>
+    let categories = [];
+
+    function addCategory() {
+        const categoryName = document.getElementById('categoryName').value;
+        if (categoryName) {
+            categories.push({
+                name: categoryName,
+                products: []
+            });
+            updateCategoriesDropdown();
+            document.getElementById('categoryName').value = '';
+        }
+    }
+
+    function updateCategoriesDropdown() {
+        const dropdown = document.getElementById('categoriesDropdown');
+        dropdown.innerHTML = '';
+        categories.forEach((category, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = category.name;
+            dropdown.appendChild(option);
+        });
+    }
+
+    function addProduct() {
+        const productName = document.getElementById('productName').value;
+        const productPrice = document.getElementById('productPrice').value;
+        const selectedCategoryIndex = document.getElementById('categoriesDropdown').value;
+
+        if (productName && productPrice && selectedCategoryIndex !== '') {
+            categories[selectedCategoryIndex].products.push({
+                name: productName,
+                price: parseFloat(productPrice)
+            });
+            document.getElementById('productName').value = '';
+            document.getElementById('productPrice').value = '';
+        }
+    }
+
+    function generateYAML() {
+        let yaml = '';
+        categories.forEach(category => {
+            yaml += category.name + ':\n';
+            category.products.forEach(product => {
+                yaml += '  - name: ' + product.name + '\n';
+                yaml += '    price: ' + product.price + '\n';
+            });
+        });
+        document.getElementById('generatedYAML').textContent = yaml;
+    }
+</script>
+</body>
+</html>
